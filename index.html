@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Devoteam - Offre Radar Cost Killing</title>
+    <title>Devoteam - Radar de Maturité Interactif</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,36 +14,29 @@
             font-family: 'Inter', sans-serif;
             background-color: #f5f5f5;
         }
-        /* Devoteam Custom Colors */
-        .devoteam-main { color: #2d2d2d; } /* Dark Grey/Black */
-        .devoteam-accent-1 { color: #D94686; } /* Pink */
-        .devoteam-accent-2 { color: #757575; } /* Medium Grey */
+        .devoteam-main { color: #2d2d2d; }
+        .devoteam-accent-1 { color: #D94686; }
+        .devoteam-bg-accent-1 { background-color: #D94686; }
 
-        .devoteam-bg-main { background-color: #2d2d2d; }
-        .devoteam-bg-accent-1 { background-color: #D94686; } /* Pink */
-        .devoteam-bg-accent-2 { background-color: #757575; }
-
-        .devoteam-border-main { border-color: #2d2d2d; }
-        .devoteam-border-accent-1 { border-color: #D94686; } /* Pink */
-        .devoteam-border-accent-2 { border-color: #757575; }
-
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
+        .slide-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2.5rem 3rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+            border: 1px solid #e2e8f0;
         }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
-            }
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2d2d2d;
+            text-align: center;
+            margin-bottom: 2.5rem;
         }
         .loader {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #2d2d2d;
+            border-top: 4px solid #D94686;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -54,654 +47,240 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
+        .prose h3 {
+            font-size: 1.25em;
+            margin-bottom: 0.5em;
+            font-weight: bold;
+            color: #2d2d2d;
         }
-        input[type=range]:focus {
-            outline: none;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #D94686; /* Pink */
+        .prose h3.clickable-axe {
             cursor: pointer;
-            margin-top: -6px;
+            text-decoration: underline;
+            text-decoration-color: #D94686;
+            text-decoration-thickness: 2px;
+            display: inline-block;
         }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 8px;
+        .prose h3.clickable-axe:hover {
+            color: #D94686;
+        }
+        .prose ul { margin-top: 0.5em; padding-left: 1.5em; list-style-type: disc; }
+        .prose li { margin-bottom: 0.25em; }
+
+        .evaluation-card {
+            background-color: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
             cursor: pointer;
-            background: #d1d5db;
-            border-radius: 5px;
+            transition: all 0.2s;
+            height: 100%;
         }
+        .evaluation-card:hover { border-color: #D94686; transform: translateY(-2px); }
+        .evaluation-card.selected { border-color: #D94686; background-color: #fce7f3; }
+        .evaluation-card .score { font-size: 1.5rem; font-weight: 800; color: #D94686; }
+        
+        .opportunity-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            margin-top: 1.5rem;
+            overflow: hidden;
+        }
+        .opportunity-card-header {
+            background-color: #2d2d2d; color: white; padding: 0.75rem 1.5rem;
+            font-weight: bold; font-size: 1.25rem;
+        }
+        .opportunity-card-body {
+            padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+        }
+        .opportunity-card-body h4 {
+            font-weight: bold; color: #D94686; margin-bottom: 0.5rem; display: flex; align-items: center;
+        }
+        .stat-number { font-size: 2.5rem; font-weight: 800; color: #2d2d2d; line-height: 1; }
+        .stat-text { font-size: 0.875rem; margin-top: 0.25rem; }
+        .source-text { font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem; }
     </style>
 </head>
-<body class="text-[#2d2d2d]">
-
-    <header class="devoteam-bg-main text-white text-center p-8 shadow-lg">
-        <h1 class="text-4xl md:text-5xl font-extrabold">Radar Cost Killing</h1>
-        <p class="mt-2 text-xl">Transformez votre DSI d'un centre de coût à un partenaire stratégique de la croissance.</p>
-    </header>
-
-    <main class="container mx-auto p-4 md:p-8">
-
-        <section id="context" class="mb-12">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-3xl font-bold devoteam-main mb-4 text-center">Le Paradoxe de l'IT en Afrique : Innover sous une Pression Maximale</h2>
-                <p class="text-center mb-8 max-w-3xl mx-auto">Le marché africain est en pleine ébullition digitale. Cette croissance fulgurante impose aux DSI un double défi : financer une innovation rapide pour rester pertinent, tout en maîtrisant des coûts opérationnels complexes et en constante augmentation.</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                    <div class="border-t-4 devoteam-border-accent-2 pt-4">
-                        <p class="text-4xl font-extrabold devoteam-main">$230 Mds</p>
-                        <p class="font-semibold">Dépenses IT prévues en 2025 (MENA)</p>
-                        <p class="text-sm text-gray-500 mt-1">Une croissance tirée par le Cloud et les logiciels. (Source: Gartner/IDC)</p>
+<body>
+    <div class="slide-container">
+        <h2 class="slide-title">Outil de Diagnostic : Radar de Maturité Interactif</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div id="evaluation-grid" class="space-y-6"></div>
+            <div class="sticky top-8">
+                <div class="bg-slate-50 p-6 rounded-lg shadow-inner">
+                    <div class="w-full max-w-md mx-auto">
+                         <canvas id="radarChart"></canvas>
                     </div>
-                    <div class="border-t-4 devoteam-border-accent-1 pt-4">
-                        <p class="text-4xl font-extrabold devoteam-main">85%</p>
-                        <p class="font-semibold">Taux de pénétration d'Internet en Tunisie</p>
-                        <p class="text-sm text-gray-500 mt-1">Une base d'utilisateurs massive et connectée qui exige des services numériques de pointe. (Source: DataReportal 2025)</p>
-                    </div>
-                    <div class="border-t-4 devoteam-border-main pt-4">
-                        <p class="text-4xl font-extrabold devoteam-main">+30%</p>
-                        <p class="font-semibold">Coûts de financement élevés</p>
-                        <p class="text-sm text-gray-500 mt-1">Un tiers des banques africaines citent le coût du financement comme un frein majeur à la transformation. (Source: EIB)</p>
+                    <div class="mt-6 text-center">
+                         <button id="generate-button" class="devoteam-bg-accent-1 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-opacity-90 transition-transform transform hover:scale-105">
+                            Générer les Pistes d'Optimisation
+                        </button>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <section id="proof" class="mb-12">
-            <h2 class="text-3xl font-bold devoteam-main mb-6 text-center">Des Gisements d'Économies Reconnus Globalement</h2>
-            <p class="text-center mb-8 max-w-3xl mx-auto">Votre situation n'est pas unique. Des études mondiales confirment l'existence de "poches" de surcoûts importantes dans la plupart des DSI. Notre mission est de les identifier et de les transformer en budget pour vos projets.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="font-bold text-lg mb-2 devoteam-main">▶ Levier Logiciels & Licences</h3>
-                    <p class="text-3xl font-bold devoteam-accent-1 mb-2">Jusqu'à 30%</p>
-                    <p>C'est l'économie réalisable la première année avec une gestion active des actifs logiciels (SAM). Le "shelfware" (logiciels payés mais non utilisés) est un fléau coûteux.</p>
-                    <p class="text-xs text-gray-500 mt-2">Source: Gartner, "3 Ways to Cut Software Costs"</p>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="font-bold text-lg mb-2 devoteam-main">▶ Levier Cloud & FinOps</h3>
-                    <p class="text-3xl font-bold devoteam-accent-2 mb-2">Plus de 30%</p>
-                    <p>C'est le gaspillage moyen sur les dépenses Cloud, souvent dû à des ressources surdimensionnées ou inactives. Une pratique FinOps rigoureuse est essentielle.</p>
-                    <p class="text-xs text-gray-500 mt-2">Source: Gartner, "How to Cut Cloud Costs"</p>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-1 md:col-span-2">
-                    <h3 class="font-bold text-lg mb-2 devoteam-main">▶ Levier Projets & Portefeuille</h3>
-                    <p class="text-3xl font-bold devoteam-main mb-2">Environ 30%</p>
-                    <p>C'est le montant des investissements IT gaspillés dans des projets qui n'atteignent pas leurs objectifs. Une gouvernance PPM forte est clé pour réallouer ces fonds.</p>
-                    <p class="text-xs text-gray-500 mt-2">Source: Gartner Research</p>
-                </div>
+        </div>
+        <div id="ai-results-container" class="mt-8">
+            <div id="ai-pistes-section" class="hidden prose max-w-none p-6 bg-slate-50 rounded-lg shadow-inner">
+                 <h3 id="pistes-title" class="text-xl font-bold text-center !m-0">Pistes d'Amélioration Prioritaires</h3>
+                 <div id="loader-pistes" class="loader hidden"></div>
+                 <div id="pistes-content"></div>
             </div>
-        </section>
-
-        <section id="run-change" class="mb-12">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-3xl font-bold devoteam-main mb-2 text-center">Le Grand Basculement : Libérer le Budget de l'Innovation</h2>
-                <p class="text-center max-w-4xl mx-auto mb-8">Le vrai défi n'est pas OPEX vs. CAPEX, mais la part de votre budget bloquée dans le "Run the Bank" (maintenance, legacy...) au détriment du "Change the Bank" (innovation, nouveaux services...). Notre objectif est de vous aider à opérer ce rééquilibrage stratégique.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-center">
-                    <div>
-                        <h3 class="text-xl font-bold mb-2">Situation Typique du Secteur Bancaire</h3>
-                        <div class="mx-auto w-full max-w-[250px] h-[250px]">
-                            <canvas id="runChangeCurrentChart"></canvas>
-                        </div>
-                        <p class="text-sm text-gray-600 mt-2">Source: McKinsey "Unlocking value: A CEO's guide to technology-driven transformation"</p>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold mb-2">Cible des Leaders Digitaux</h3>
-                        <div class="mx-auto w-full max-w-[250px] h-[250px]">
-                            <canvas id="runChangeTargetChart"></canvas>
-                        </div>
-                        <p class="text-sm text-gray-600 mt-2">Source: Deloitte "Tech Trends 2024"</p>
-                    </div>
-                </div>
+            <div id="ai-details-section" class="hidden mt-6">
+                <div id="loader-details" class="loader hidden"></div>
+                <div id="details-content"></div>
             </div>
-        </section>
-
-        <section id="expertise-bridge" class="mb-12">
-            <div class="bg-slate-100 rounded-lg p-6 text-center">
-                <h2 class="text-3xl font-bold devoteam-main mb-4">Notre Offre est Née de Votre Réalité</h2>
-                <p class="max-w-4xl mx-auto mb-6">L'offre "Radar Cost Killing" n'est pas un outil théorique. C'est la synthèse de nos expériences terrain. C'est en menant des missions de transformation complexes que nous avons identifié ces leviers d'optimisation récurrents.</p>
-                <div class="flex flex-wrap justify-center gap-4 text-white">
-                    <span class="bg-gray-800 rounded-full px-4 py-2 text-sm font-semibold">Schéma Directeur SI</span>
-                    <span class="bg-gray-800 rounded-full px-4 py-2 text-sm font-semibold">Gouvernance IT</span>
-                    <span class="bg-gray-800 rounded-full px-4 py-2 text-sm font-semibold">AMOA & PMO</span>
-                    <span class="bg-gray-800 rounded-full px-4 py-2 text-sm font-semibold">Architecture & Infra</span>
-                     <span class="bg-gray-800 rounded-full px-4 py-2 text-sm font-semibold">Sécurité & Conformité</span>
-                </div>
-                <p class="max-w-4xl mx-auto mt-6">Notre connaissance approfondie de ces domaines nous donne une vision 360° unique pour détecter les inefficacités là où d'autres ne voient que la complexité technique.</p>
-            </div>
-        </section>
-
-        <section id="rex" class="mb-12">
-            <h2 class="text-3xl font-bold devoteam-main mb-6 text-center">La Preuve par l'Exemple (REX Secteur Bancaire)</h2>
-             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 devoteam-border-accent-1">
-                    <h3 class="font-bold text-lg mb-2 devoteam-main">REX Portefeuille Projets (PMO)</h3>
-                    <p class="text-3xl font-bold devoteam-accent-1 mb-2">20%</p>
-                    <p>C'est la part du portefeuille projets jugée non-alignée ou irréalisable lors d'un audit chez une <span class="font-bold">grande banque en Tunisie</span>. Notre mission a permis de stopper ces initiatives et de réallouer <span class="font-bold">1.5M TND</span> vers des projets d'innovation.</p>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 devoteam-border-accent-2">
-                    <h3 class="font-bold text-lg mb-2 devoteam-main">REX Rationalisation Applicative (SDSI)</h3>
-                    <p class="text-3xl font-bold devoteam-accent-2 mb-2">35</p>
-                    <p>C'est le nombre d'applications jugées redondantes ou obsolètes chez un <span class="font-bold">acteur financier panafricain</span>. Notre plan de décommissionnement a permis de réduire de <span class="font-bold">15% le TCO</span> du parc applicatif en année 1.</p>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 devoteam-border-main">
-                    <h3 class="font-bold text-lg mb-2 devoteam-main">REX Optimisation Infra & Cloud</h3>
-                    <p class="text-3xl font-bold devoteam-main mb-2">18%</p>
-                    <p>C'est l'économie réalisée sur les coûts d'hébergement annuels pour une <span class="font-bold">banque de détail</span> grâce à la mise en place d'une gouvernance FinOps et au redimensionnement des environnements, soit une économie de <span class="font-bold">800k TND/an</span>.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="methodology" class="mb-12">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-3xl font-bold devoteam-main mb-4 text-center">Une Approche Structurée autour de 8 Levier Clés</h2>
-                <p class="text-center max-w-4xl mx-auto mb-8">Pour garantir une analyse complète et rigoureuse, notre démarche s'articule autour de 8 piliers fondamentaux. Chacun de ces leviers, inspiré des meilleures pratiques du référentiel ITIL 4, fait l'objet d'un questionnaire détaillé pour évaluer votre maturité et identifier précisément les gisements d'économies.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-slate-50 p-3 rounded-lg border-l-4 devoteam-border-main">
-                        <h3 class="font-bold text-sm">1. Optimisation applicative & solutions</h3>
-                        <p class="text-xs text-gray-500 mt-1">ITIL: Application Management, Service Catalog</p>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-lg border-l-4 devoteam-border-accent-1">
-                        <h3 class="font-bold text-sm">2. Optimisation des licences & abonnements</h3>
-                        <p class="text-xs text-gray-500 mt-1">ITIL: Software Asset Management (SAM)</p>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-lg border-l-4 devoteam-border-accent-2">
-                        <h3 class="font-bold text-sm">3. Optimisation des contrats IT & maintenance</h3>
-                        <p class="text-xs text-gray-500 mt-1">ITIL: Supplier Management</p>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-lg border-l-4 devoteam-border-main">
-                        <h3 class="font-bold text-sm">4. Optimisation des ressources internes & externes</h3>
-                        <p class="text-xs text-gray-500 mt-1">ITIL: Workforce & Talent Management</p>
-                    </div>
-                     <div class="bg-slate-50 p-3 rounded-lg border-l-4 devoteam-border-accent-1">
-                        <h3 class="font-bold text-sm">5. Optimisation des processus & automatisation</h3>
-                        <p class="text-xs text-gray-500 mt-1">ITIL: Continual Improvement, Service Automation</p>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-lg border-l-4 devoteam-border-accent-2">
-                        <h3 class="font-bold text-sm">6. Optimisation des coûts cloud (FinOps)</h3>
-                        <p class="text-xs text-gray-500 mt-1">ITIL: Financial Mgt for IT Services, Cloud Mgt</p>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-lg border-l-4 devoteam-border-main">
-                        <h3 class="font-bold text-sm">7. Optimisation du portefeuille projets & budgets IT</h3>
-                        <p class="text-xs text-gray-500 mt-1">ITIL: Portfolio Management</p>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-lg border-l-4 devoteam-border-accent-1">
-                        <h3 class="font-bold text-sm">8. Gouvernance & culture de frugalité IT</h3>
-                        <p class="text-xs text-gray-500 mt-1">ITIL: IT Governance, Continual Improvement</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="radar-tool" class="mb-12">
-            <h2 class="text-3xl font-bold devoteam-main mb-6 text-center">Notre Outil : Le Radar Devoteam Interactif</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-2xl font-semibold mb-2">Auto-évaluez votre maturité.</h3>
-                    <p class="mb-4 text-sm">Ajustez les curseurs (1=Faible, 5=Excellent) pour refléter la situation de votre DSI. Le graphique se mettra à jour en temps réel.</p>
-                    <div id="sliders-container" class="space-y-3"></div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="chart-container">
-                        <canvas id="radarChart"></canvas>
-                    </div>
-                </div>
-            </div>
-             <div class="text-center mt-6">
-                <button id="generateButton" class="devoteam-bg-accent-1 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-opacity-90 transition-transform transform hover:scale-105">
-                    ✨ Générer des Pistes d'Optimisation par IA
-                </button>
-            </div>
-            <div id="ai-recommendations" class="hidden mt-6 bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-2xl font-bold devoteam-main mb-4 text-center">Vos Pistes d'Optimisation Personnalisées</h3>
-                <div id="loader" class="loader hidden"></div>
-                <div id="recommendations-content" class="text-left"></div>
-                 <p id="error-message" class="text-red-500 text-center hidden"></p>
-            </div>
-        </section>
-        
-        <h2 class="text-3xl font-bold devoteam-main mb-6 text-center">Notre Démarche : De l'Impact Immédiat à la Pérennité</h2>
-        
-        <section id="phase1" class="mb-2">
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-8 devoteam-border-accent-2">
-                <h3 class="text-2xl font-bold mb-3"><span class="devoteam-bg-accent-2 text-white rounded-full px-3 py-1 mr-2">1</span>Phase 1 : Diagnostic & Cadrage Stratégique (2-4 sem.)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-bold mb-1">Objectifs</h4>
-                        <p class="text-sm">Établir une photographie factuelle de vos coûts, identifier les gisements d'économies et aligner les parties prenantes sur les priorités.</p>
-                        <h4 class="font-bold mt-3 mb-1">Actions Clés</h4>
-                        <ul class="list-disc list-inside text-sm space-y-1">
-                            <li>Ateliers de cadrage COMEX / DSI</li>
-                            <li>Déploiement du questionnaire sur les 8 leviers</li>
-                            <li>Interviews des acteurs clés (Achats, PMO, Métiers)</li>
-                            <li>Analyse des données (budgets, contrats, CMDB)</li>
-                        </ul>
-                    </div>
-                    <div>
-                         <h4 class="font-bold mb-1">Livrables</h4>
-                        <ul class="list-disc list-inside text-sm space-y-1">
-                            <li><span class="font-semibold">Radar de maturité</span> et scoring détaillé</li>
-                            <li>Première <span class="font-semibold">quantification des gains</span> potentiels par levier</li>
-                            <li>Rapport de diagnostic complet</li>
-                        </ul>
-                        <h4 class="font-bold mt-3 mb-1">Profils Devoteam</h4>
-                        <p class="text-sm">Directeur de Mission, Consultant Senior Stratégie IT, Expert Financier IT.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="mb-8 px-4 md:px-8">
-            <div class="bg-slate-50 rounded-b-lg shadow-inner p-6">
-                <h4 class="text-lg font-bold text-center mb-4 devoteam-main">Exemple de Livrable - Phase 1 : Synthèse du Diagnostic</h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
-                        <thead class="bg-slate-200">
-                            <tr>
-                                <th class="p-2">Levier</th>
-                                <th class="p-2 text-center">Score</th>
-                                <th class="p-2">Signal Fort / Commentaire Clé</th>
-                                <th class="p-2">Gain Potentiel</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b"><td class="p-2 font-semibold">Contrats IT & maintenance</td><td class="p-2 text-center font-bold devoteam-accent-1">1/5</td><td class="p-2">Reconductions tacites systématiques, SLAs non alignés avec les besoins réels.</td><td class="p-2 font-semibold">150k TND/an</td></tr>
-                            <tr class="border-b"><td class="p-2 font-semibold">Portefeuille projets</td><td class="p-2 text-center font-bold devoteam-accent-1">2/5</td><td class="p-2">17 projets actifs sans priorisation claire, risque de dispersion de l'effort et des budgets.</td><td class="p-2 font-semibold">> 1M TND</td></tr>
-                            <tr class="border-b"><td class="p-2 font-semibold">Licences & abonnements</td><td class="p-2 text-center font-bold text-orange-500">3/5</td><td class="p-2">Audit partiel, des doublons identifiés mais pas de processus de réaffectation.</td><td class="p-2 font-semibold">80k TND/an</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <section id="phase2" class="mb-2">
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-8 devoteam-border-main">
-                <h3 class="text-2xl font-bold mb-3"><span class="devoteam-bg-main text-white rounded-full px-3 py-1 mr-2">2</span>Phase 2 : Quick Wins & Adhésion (30 jours)</h3>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-bold mb-1">Objectifs</h4>
-                        <p class="text-sm">Générer des économies immédiates pour démontrer la valeur de la démarche, créer un momentum positif et sécuriser l'adhésion du COMEX.</p>
-                        <h4 class="font-bold mt-3 mb-1">Actions Clés</h4>
-                        <ul class="list-disc list-inside text-sm space-y-1">
-                            <li>Atelier de priorisation (matrice effort/impact)</li>
-                            <li>Co-construction du plan d'action "30 jours"</li>
-                             <li>Lancement des 5-10 actions à gains rapides</li>
-                            <li>Mise en place du suivi des économies</li>
-                        </ul>
-                    </div>
-                    <div>
-                         <h4 class="font-bold mb-1">Livrables</h4>
-                        <ul class="list-disc list-inside text-sm space-y-1">
-                            <li><span class="font-semibold">Plan d'action "Quick Wins"</span> détaillé et validé</li>
-                            <li>Premier <span class="font-semibold">tableau de bord des économies</span></li>
-                            <li>Communication de succès</li>
-                        </ul>
-                        <h4 class="font-bold mt-3 mb-1">Profils Devoteam</h4>
-                        <p class="text-sm">Consultant Senior, Expert FinOps/SAM, Consultant PMO.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="mb-8 px-4 md:px-8">
-             <div class="bg-slate-50 rounded-b-lg shadow-inner p-6">
-                <h4 class="text-lg font-bold text-center mb-4 devoteam-main">Exemple de Livrable - Phase 2 : Plan d'Action Quick Wins</h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
-                        <thead class="bg-slate-200">
-                            <tr><th class="p-2">Action Prioritaire</th><th class="p-2">Gain Estimé</th><th class="p-2">Difficulté</th><th class="p-2">Délai</th><th class="p-2">Responsable</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b"><td class="p-2 font-semibold">Résilier 50 licences SaaS inutilisées (Adobe, etc.)</td><td class="p-2">80k TND/an</td><td class="p-2"><span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Faible</span></td><td class="p-2">1 mois</td><td class="p-2">IT Ops</td></tr>
-                            <tr class="border-b"><td class="p-2 font-semibold">Arrêter 10 instances Cloud de test inactives</td><td class="p-2">50k TND/an</td><td class="p-2"><span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Faible</span></td><td class="p-2">2 semaines</td><td class="p-2">FinOps Lead</td></tr>
-                            <tr class="border-b"><td class="p-2 font-semibold">Renégocier le contrat de maintenance ERP</td><td class="p-2">40k TND/an</td><td class="p-2"><span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Faible</span></td><td class="p-2">1 mois</td><td class="p-2">Achats IT</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-        
-        <section id="phase3" class="mb-2">
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-8 devoteam-border-accent-1">
-                <h3 class="text-2xl font-bold mb-3"><span class="devoteam-bg-accent-1 text-white rounded-full px-3 py-1 mr-2">3</span>Phase 3 : Définition des Impacts Structurels (3-6 mois)</h3>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-bold mb-1">Objectifs</h4>
-                        <p class="text-sm">Traduire les gisements d'économies complexes en un plan de transformation clair, chiffré et prêt à être arbitré par le COMEX.</p>
-                        <h4 class="font-bold mt-3 mb-1">Actions Clés</h4>
-                        <ul class="list-disc list-inside text-sm space-y-1">
-                            <li>Cadrage des initiatives complexes (rationalisation...)</li>
-                            <li>Élaboration des business cases détaillés (ROI, coûts)</li>
-                            <li>Construction de la roadmap de transformation</li>
-                            <li>Identification des prérequis (compétences, gouvernance)</li>
-                        </ul>
-                    </div>
-                    <div>
-                         <h4 class="font-bold mb-1">Livrables</h4>
-                        <ul class="list-disc list-inside text-sm space-y-1">
-                            <li><span class="font-semibold">Roadmap de transformation</span> à 6-12 mois</li>
-                            <li><span class="font-semibold">Business cases chiffrés</span> pour chaque chantier</li>
-                            <li>Fiches projet prêtes à être lancées</li>
-                        </ul>
-                        <h4 class="font-bold mt-3 mb-1">Profils Devoteam</h4>
-                        <p class="text-sm">Architecte SI, Consultant PMO, Directeur de Mission.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="mb-8 px-4 md:px-8">
-            <div class="bg-slate-50 rounded-b-lg shadow-inner p-6">
-                 <h4 class="text-lg font-bold text-center mb-4 devoteam-main">Exemple de Livrable - Phase 3 : Fiche Synthétique de Business Case</h4>
-                 <div class="bg-white rounded-lg shadow-md p-4 border-t-4 devoteam-border-accent-1">
-                    <h5 class="font-bold text-md text-center devoteam-main">Projet Structurant : Rationalisation du Parc Applicatif CRM</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 text-sm">
-                        <div>
-                            <p><span class="font-semibold">Problématique :</span> 3 applications CRM redondantes, TCO annuel de 750k TND, expérience utilisateur fragmentée, coûts de maintenance élevés.</p>
-                            <p class="mt-2"><span class="font-semibold">Solution Proposée :</span> Convergence vers une solution CRM unique. Décommissionnement des 2 autres applications et migration des données clés.</p>
-                        </div>
-                         <div>
-                            <p><span class="font-semibold">Gains Annuels Estimés :</span> <strong class="text-green-600">450k TND</strong> (licences, maintenance, infra).</p>
-                            <p class="mt-1"><span class="font-semibold">Coût du Projet Estimé :</span> <strong class="devoteam-accent-1">200k TND</strong> (sur 6 mois).</p>
-                            <p class="mt-1"><span class="font-semibold">ROI (1ère année) :</span> <strong class="text-blue-600">125%</strong>.</p>
-                             <p class="mt-1"><span class="font-semibold">Risques :</span> Conduite du changement, complexité de la migration des données.</p>
-                        </div>
-                    </div>
-                 </div>
-            </div>
-        </section>
-
-        <section id="phase4" class="mb-2">
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-8 devoteam-border-main">
-                <h3 class="text-2xl font-bold mb-3"><span class="devoteam-bg-main text-white rounded-full px-3 py-1 mr-2">4</span>Phase 4 : Conception de la Pérennisation (Continu)</h3>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-bold mb-1">Objectifs</h4>
-                        <p class="text-sm">Fournir les outils et recommandations pour que les bonnes pratiques s'ancrent dans la durée et que la DSI pilote ses coûts avec agilité.</p>
-                        <h4 class="font-bold mt-3 mb-1">Actions Clés</h4>
-                        <ul class="list-disc list-inside text-sm space-y-1">
-                            <li>Conception des dashboards de pilotage des coûts</li>
-                            <li>Recommandations sur les KPIs de frugalité</li>
-                            <li>Définition d'un plan de conduite du changement</li>
-                            <li>Formalisation d'un guide de bonnes pratiques</li>
-                        </ul>
-                    </div>
-                    <div>
-                         <h4 class="font-bold mb-1">Livrables</h4>
-                        <ul class="list-disc list-inside text-sm space-y-1">
-                            <li><span class="font-semibold">Kit de gouvernance de la performance IT</span> (templates, KPIs)</li>
-                            <li>Plan de communication et de formation</li>
-                            <li>Synthèse exécutive pour le COMEX</li>
-                        </ul>
-                        <h4 class="font-bold mt-3 mb-1">Profils Devoteam</h4>
-                        <p class="text-sm">Directeur de Mission, Consultant en Automatisation.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="mb-12 px-4 md:px-8">
-            <div class="bg-slate-50 rounded-b-lg shadow-inner p-6">
-                <h4 class="text-lg font-bold text-center mb-4 devoteam-main">Exemple de Livrable - Phase 4 : Fiche de Pilotage de la Performance IT</h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left bg-white shadow-md rounded-lg">
-                        <thead class="bg-slate-200">
-                            <tr>
-                                <th class="p-3">Indicateur Clé de Performance (KPI)</th>
-                                <th class="p-3 text-center">Cible</th>
-                                <th class="p-3 text-center">Actuel</th>
-                                <th class="p-3">Impact Métier & Plan d'Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b">
-                                <td class="p-3 font-semibold">Alignement Stratégique du Portefeuille Projets</td>
-                                <td class="p-3 text-center font-semibold">> 90%</td>
-                                <td class="p-3 text-center font-bold text-red-600">78% <span class="text-xs">▼</span></td>
-                                <td class="p-3"><strong class="block">Impact :</strong> Risque de gaspillage du budget "Change" sur des projets non prioritaires.<br><strong class="block mt-1">Action :</strong> Revue trimestrielle du portefeuille par le PMO. Go/No-Go formel pour les projets > 50k TND.</td>
-                            </tr>
-                             <tr class="border-b">
-                                <td class="p-3 font-semibold">Ratio "Run" vs "Change"</td>
-                                <td class="p-3 text-center font-semibold">< 60%</td>
-                                <td class="p-3 text-center font-bold text-orange-500">68% <span class="text-green-600 text-xs">▲</span></td>
-                                <td class="p-3"><strong class="block">Impact :</strong> Capacité d'innovation limitée par le poids de la maintenance.<br><strong class="block mt-1">Action :</strong> Lancer le projet de rationalisation CRM (cf. Phase 3). Objectif : -5 pts en 12 mois.</td>
-                            </tr>
-                             <tr>
-                                <td class="p-3 font-semibold">Efficience des Coûts Cloud</td>
-                                <td class="p-3 text-center font-semibold">< 5%</td>
-                                <td class="p-3 text-center font-bold text-green-600">3% <span class="text-green-600 text-xs">▲</span></td>
-                                <td class="p-3"><strong class="block">Impact :</strong> Maîtrise des dépenses OPEX et maximisation du ROI des investissements Cloud.<br><strong class="block mt-1">Action :</strong> Maintenir les rituels FinOps mensuels. Automatiser l'extinction des environnements hors production.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <footer class="text-center p-6 bg-gray-800 text-white">
-        <p class="font-bold text-lg">devoteam</p>
-        <p>AI-driven tech consulting</p>
-    </footer>
+            <p id="error-message" class="text-red-600 mt-4 text-center font-semibold hidden"></p>
+        </div>
+    </div>
 
     <script>
-        const radarLabelsText = [
-            'Optimisation applicative & solutions',
-            'Optimisation des licences & abonnements',
-            'Optimisation des contrats IT & maintenance',
-            'Optimisation des ressources internes & externes',
-            'Optimisation des processus & automatisation',
-            'Optimisation des coûts cloud (FinOps)',
-            'Optimisation du portefeuille projets & budgets IT',
-            'Gouvernance & culture de frugalité IT'
-        ];
+        const evaluationData = {
+            "1. Applicatif & Solutions": [{ score: 1, title: "Parc déséquilibré" }, { score: 2, title: "Peu optimisé" }, { score: 3, title: "En rationalisation" }, { score: 4, title: "Optimisé" }],
+            "2. Licences & SaaS": [{ score: 1, title: "Surdimensionnées" }, { score: 2, title: "Suivi partiel" }, { score: 3, title: "Gestion proactive" }, { score: 4, title: "Optimisées" }],
+            "3. Contrats IT": [{ score: 1, title: "Non renégociés" }, { score: 2, title: "Opportunistes" }, { score: 3, title: "Structurés" }, { score: 4, title: "Optimisés" }],
+            "4. Ressources internes / externes": [{ score: 1, title: "Mal allouées" }, { score: 2, title: "Peu optimisées" }, { score: 3, title: "Rationalisées" }, { score: 4, title: "Flexibles" }],
+            "5. Processus & IA": [{ score: 1, title: "Manuels" }, { score: 2, title: "Ponctuels" }, { score: 3, title: "Semi-automatisés" }, { score: 4, title: "IA-native" }],
+            "6. Cloud & FinOps": [{ score: 1, title: "Non suivis" }, { score: 2, title: "Suivi partiel" }, { score: 3, title: "Actif" }, { score: 4, title: "Intégré" }],
+            "7. Portefeuille projets & budgets": [{ score: 1, title: "Dispersés" }, { score: 2, title: "Pilotage basique" }, { score: 3, title: "ROI-first" }, { score: 4, title: "Dynamique" }],
+            "8. Gouvernance & frugalité": [{ score: 1, title: "Faible" }, { score: 2, title: "Passive" }, { score: 3, title: "Active" }, { score: 4, title: "Intégrée" }]
+        };
 
-        const initialScores = [3, 2, 2, 3, 4, 2, 2, 3];
+        const radarLabelsText = Object.keys(evaluationData);
+        let currentScores = [3, 2, 1, 4, 1, 2, 1, 2];
         let radarChartInstance;
 
-        const processLabel = (label) => {
-            if (label.length <= 16) return label;
-            const words = label.split(' ');
-            let lines = [];
-            let currentLine = '';
-            for (const word of words) {
-                if ((currentLine + ' ' + word).trim().length > 16) {
-                    lines.push(currentLine.trim());
-                    currentLine = word;
-                } else {
-                    currentLine = (currentLine + ' ' + word).trim();
-                }
-            }
-            if (currentLine) {
-                lines.push(currentLine.trim());
-            }
-            return lines;
-        };
-        
-        const tooltipTitleCallback = (tooltipItems) => {
-            const item = tooltipItems[0];
-            let label = item.chart.data.labels[item.dataIndex];
-            if (Array.isArray(label)) {
-              return label.join(' ');
-            } else {
-              return label;
-            }
-        };
-
-        function setupSliders() {
-            const container = document.getElementById('sliders-container');
-            container.innerHTML = radarLabelsText.map((label, index) => {
-                const shortLabel = label.split('&')[0].trim();
-                return `
-                <div class="slider-item">
-                    <label for="slider-${index}" class="block text-sm font-medium">${shortLabel} : <span id="value-${index}" class="font-bold devoteam-main">${initialScores[index]}</span></label>
-                    <input type="range" id="slider-${index}" name="${label}" min="1" max="5" value="${initialScores[index]}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+        const createEvaluationGrid = () => {
+            const gridContainer = document.getElementById('evaluation-grid');
+            gridContainer.innerHTML = radarLabelsText.map((axe, axeIndex) => `
+                <div>
+                    <h3 class="font-bold text-lg mb-2">${axe}</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        ${evaluationData[axe].map((option) => `
+                            <div class="evaluation-card ${currentScores[axeIndex] === option.score ? 'selected' : ''}" data-axe-index="${axeIndex}" data-score="${option.score}">
+                                <p class="score">${option.score}</p>
+                                <p class="text-xs font-semibold mt-1">${option.title}</p>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
-            `}).join('');
+            `).join('');
 
-            radarLabelsText.forEach((_, index) => {
-                document.getElementById(`slider-${index}`).addEventListener('input', (event) => {
-                    document.getElementById(`value-${index}`).textContent = event.target.value;
+            document.querySelectorAll('.evaluation-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const axeIndex = parseInt(card.dataset.axeIndex);
+                    const newScore = parseInt(card.dataset.score);
+                    currentScores[axeIndex] = newScore;
+                    const cardsForAxe = document.querySelectorAll(`.evaluation-card[data-axe-index="${axeIndex}"]`);
+                    cardsForAxe.forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
                     updateRadarChart();
                 });
             });
-        }
+        };
 
-        function getCurrentScores() {
-            return radarLabelsText.map((_, index) => {
-                return parseInt(document.getElementById(`slider-${index}`).value, 10);
-            });
-        }
+        const updateRadarChart = () => { if (radarChartInstance) { radarChartInstance.data.datasets[0].data = currentScores; radarChartInstance.update(); } };
 
-        function updateRadarChart() {
-            if (radarChartInstance) {
-                radarChartInstance.data.datasets[0].data = getCurrentScores();
-                radarChartInstance.update();
-            }
-        }
-
-        function createRadarChart() {
+        const createRadarChart = () => {
+            const shortLabels = radarLabelsText.map(label => label.split('.')[1].trim().split('&')[0].trim());
             const radarChartCtx = document.getElementById('radarChart').getContext('2d');
-            const radarLabels = radarLabelsText.map(processLabel);
             radarChartInstance = new Chart(radarChartCtx, {
                 type: 'radar',
-                data: {
-                    labels: radarLabels,
-                    datasets: [{
-                        label: 'Votre Score de Maturité',
-                        data: getCurrentScores(),
-                        backgroundColor: 'rgba(217, 70, 134, 0.2)',
-                        borderColor: '#D94686',
-                        borderWidth: 2
-                    }, {
-                        label: 'Benchmark Secteur Bancaire',
-                        data: [4, 4, 3, 4, 4, 3, 4, 4],
-                        backgroundColor: 'rgba(45, 45, 45, 0.2)',
-                        borderColor: '#2d2d2d',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    scales: { r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 5, pointLabels: { font: { size: 10 } }, ticks: { stepSize: 1 } } },
-                    plugins: { tooltip: { callbacks: { title: tooltipTitleCallback } } }
-                }
+                data: { labels: shortLabels, datasets: [{ label: 'Votre Score', data: currentScores, backgroundColor: 'rgba(217, 70, 134, 0.2)', borderColor: '#D94686', borderWidth: 2 }, { label: 'Benchmark Secteur Bancaire', data: [3.5, 3, 3, 4, 3, 3.5, 3, 3.5], backgroundColor: 'rgba(45, 45, 45, 0.1)', borderColor: '#2d2d2d', borderWidth: 2, borderDash: [5, 5] }] },
+                options: { maintainAspectRatio: true, scales: { r: { suggestedMin: 0, suggestedMax: 4, pointLabels: { font: { size: 11 } }, ticks: { stepSize: 1 } } }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } } }
             });
-        }
-        
-        function createDonutChart(canvasId, data) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Run the Bank', 'Change the Bank'],
-                    datasets: [{
-                        data: data,
-                        backgroundColor: ['#2d2d2d', '#D94686'],
-                        borderColor: ['#ffffff', '#ffffff'],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}%` } }
-                    },
-                    cutout: '60%'
-                }
-            });
-        }
-        
-        // =================== AI RECOMMENDATION FUNCTION (ADJUSTED) ===================
+        };
 
-        async function getAiRecommendations() {
-            // !!! IMPORTANT SECURITY WARNING !!!
-            // The line below is for LOCAL TESTING ONLY.
-            // You must manually paste your API key here to make it work.
-            // Do NOT deploy this code to a public website with your key in it.
-            // Your API key will be exposed, leading to potential misuse and high costs.
-            // The correct, secure method is to have a backend server make this API call.
-            // The browser (client-side) CANNOT securely access system environment variables.
-            const apiKey = "AIzaSyCJGihKmQW5WxbGXdrWBhnfS_Sx9u2Y4Fc";
-
-            if (apiKey === "PASTE_YOUR_GOOGLE_API_KEY_HERE") {
-                alert("Veuillez coller votre clé API Google dans le code pour activer cette fonctionnalité.");
-                return;
+        const fetchWithBackoff = async (url, options, retries = 3, delay = 1000) => {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return response.json();
+                    if (response.status === 429 || response.status >= 500) { await new Promise(res => setTimeout(res, delay)); delay *= 2; } 
+                    else { return response.json(); }
+                } catch (error) { await new Promise(res => setTimeout(res, delay)); delay *= 2; }
             }
+            throw new Error(`Failed to fetch after ${retries} retries.`);
+        };
+        
+        async function getInitialPistes() {
+            const pistesSection = document.getElementById('ai-pistes-section');
+            const loader = document.getElementById('loader-pistes');
+            const pistesContent = document.getElementById('pistes-content');
+            const errorMessage = document.getElementById('error-message');
 
-            const model = 'gemini-1.5-flash-latest';
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            
-            const recommendationsSection = document.getElementById('ai-recommendations');
-            const loader = document.getElementById('loader');
-            const contentDiv = document.getElementById('recommendations-content');
-            const errorDiv = document.getElementById('error-message');
-
-            recommendationsSection.classList.remove('hidden');
+            pistesSection.classList.remove('hidden');
             loader.classList.remove('hidden');
-            contentDiv.innerHTML = '';
-            errorDiv.classList.add('hidden');
+            pistesContent.innerHTML = '';
+            errorMessage.classList.add('hidden');
+            document.getElementById('ai-details-section').classList.add('hidden');
+
+            const apiKey = "AIzaSyCJGihKmQW5WxbGXdrWBhnfS_Sx9u2Y4Fc";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const scoresText = radarLabelsText.map((label, index) => `- ${label}: ${currentScores[index]}/4`).join('\n');
+            const prompt = `Vous êtes un consultant expert Devoteam. Analysez ces scores de maturité IT d'une DSI bancaire:\n${scoresText}\nVotre mission est de générer un plan d'action initial. Identifiez les axes avec un score de 1 ou 2. Pour chaque axe identifié, générez une recommandation détaillée sous la forme suivante :\n<h3 class="clickable-axe" data-axe="${"Nom Exact de l'Axe"}">[Titre de la Recommandation]</h3><ul><li>[Action 1]</li><li>[Action 2]</li><li>[Action 3]</li></ul>\nLe titre de la recommandation doit être impactant et commencer par un verbe. Ne produisez QUE le code HTML des recommandations.`;
             
-            const scores = getCurrentScores();
-            const scoresText = radarLabelsText.map((label, index) => `- ${label}: ${scores[index]}/5`).join('\n');
-
-            const prompt = `Vous êtes un consultant expert en optimisation des coûts IT pour le secteur bancaire en Afrique chez Devoteam. Un DSI a auto-évalué sa maturité (1=faible, 5=excellent). Voici ses scores :
-${scoresText}
-
-Le contexte africain est marqué par une forte croissance des dépenses IT, une pression pour l'innovation (mobile banking) et des contraintes réglementaires et de financement. Des études Gartner montrent des potentiels d'économie de 30% sur les logiciels et le cloud.
-
-En vous basant sur ce contexte et les scores du DSI, générez 3 recommandations stratégiques très concrètes. Ciblez les 2-3 axes avec les scores les plus bas. Chaque recommandation doit être un paragraphe court et percutant, précédé d'un titre en gras. La tonalité doit être celle d'un expert s'adressant à un décideur. Formatez la réponse en HTML, en utilisant des balises <ul>, <li>, et <strong> pour les titres. N'utilisez pas de markdown.`;
-            
-            const payload = {
-                contents: [{
-                    parts: [{ text: prompt }]
-                }],
-            };
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
 
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error.message || `HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    contentDiv.innerHTML = text;
+                const result = await fetchWithBackoff(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
+                    pistesContent.innerHTML = result.candidates[0].content.parts[0].text;
+                    document.querySelectorAll('.clickable-axe').forEach(item => {
+                        item.addEventListener('click', () => getDetailedOpportunity(item.dataset.axe));
+                    });
                 } else {
-                    console.error('Invalid response structure from API:', result);
-                    errorDiv.textContent = "La réponse de l'IA est invalide. Veuillez réessayer.";
-                    errorDiv.classList.remove('hidden');
+                    errorMessage.textContent = "La réponse de l'IA est invalide. Veuillez réessayer.";
+                    errorMessage.classList.remove('hidden');
                 }
             } catch (error) {
-                console.error('Error fetching AI recommendations:', error);
-                errorDiv.textContent = `Une erreur est survenue lors de la communication avec l'IA : ${error.message}`;
-                errorDiv.classList.remove('hidden');
+                errorMessage.textContent = "Erreur de communication avec l'IA. Veuillez réessayer.";
+                errorMessage.classList.remove('hidden');
             } finally {
                 loader.classList.add('hidden');
             }
         }
-        // =================== END OF ADJUSTED FUNCTION ===================
 
-        document.getElementById('generateButton').addEventListener('click', getAiRecommendations);
+        async function getDetailedOpportunity(axeName) {
+            const detailsSection = document.getElementById('ai-details-section');
+            const loader = document.getElementById('loader-details');
+            const detailsContent = document.getElementById('details-content');
+            const errorMessage = document.getElementById('error-message');
+
+            detailsSection.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            detailsContent.innerHTML = '';
+            errorMessage.classList.add('hidden');
+            
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const prompt = `Vous êtes un expert Devoteam. Créez une "Fiche d'Opportunité" pour l'axe "${axeName}" d'une DSI bancaire. Utilisez IMPÉRATIVEMENT le template HTML fourni. Remplissez les [CROCHETS] avec des chiffres et des sources crédibles (Gartner, McKinsey) et un REX Devoteam pertinent et anonymisé.\nTemplate HTML :\n<div class="opportunity-card"><div class="opportunity-card-header">Zoom sur : ${axeName}</div><div class="opportunity-card-body"><div><h4><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" /></svg>L'Argument Clé (Benchmark)</h4><p class="stat-number">[Chiffre Clé Pertinent]</p><p class="stat-text">[Texte explicatif du benchmark].</p><p class="source-text">Source: [Nom de la source]</p></div><div><h4><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>La Preuve (REX Devoteam)</h4><p class="stat-number">[Chiffre Clé du REX]</p><p class="stat-text">[Texte explicatif du REX].</p></div></div></div>`;
+
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+
+             try {
+                const result = await fetchWithBackoff(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
+                    detailsContent.innerHTML = result.candidates[0].content.parts[0].text;
+                    detailsContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    errorMessage.textContent = "La réponse de l'IA est invalide. Veuillez réessayer.";
+                    errorMessage.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorMessage.textContent = "Erreur de communication avec l'IA. Veuillez réessayer.";
+                errorMessage.classList.remove('hidden');
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
         
+        document.getElementById('generate-button').addEventListener('click', getInitialPistes);
+
         window.addEventListener('load', () => {
-            setupSliders();
+            createEvaluationGrid();
             createRadarChart();
-            createDonutChart('runChangeCurrentChart', [75, 25]);
-            createDonutChart('runChangeTargetChart', [50, 50]);
         });
     </script>
 </body>
 </html>
+
