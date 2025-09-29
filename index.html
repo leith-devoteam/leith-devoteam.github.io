@@ -634,7 +634,8 @@
             }
 
             const model = 'gemini-1.5-flash-latest';
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            // const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
             
             const recommendationsSection = document.getElementById('ai-recommendations');
             const loader = document.getElementById('loader');
@@ -705,4 +706,5 @@ En vous basant sur ce contexte et les scores du DSI, générez 3 recommandations
     </script>
 </body>
 </html>
+
 
