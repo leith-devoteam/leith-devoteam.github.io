@@ -633,7 +633,9 @@
                 return;
             }
 
-            const model = 'gemini-1.5-flash-latest';
+            //const model = 'gemini-1.5-flash-latest';
+            const model = 'gemini-pro';
+            
             // const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
             const apiUrl = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
             
@@ -706,5 +708,6 @@ En vous basant sur ce contexte et les scores du DSI, générez 3 recommandations
     </script>
 </body>
 </html>
+
 
 
